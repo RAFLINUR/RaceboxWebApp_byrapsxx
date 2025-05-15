@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Speed Tracker with Controls</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #e3f2fd, #ffffff);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 2em 1em 1em;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 0.2em;
+    }
+
+    #speed {
+      font-size: 3.5em;
+      color: #2196f3;
+      font-weight: bold;
+    }
+
+    .note {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 1em;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1em;
+      margin-top: 1em;
+    }
+
+    button {
+      padding: 0.6em 1.2em;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button.start {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    button.stop {
+      background-color: #f44336;
+      color: white;
+    }
+
+    button.reset {
+      background-color: #ff9800;
+      color: white;
+    }
+
+    .milestone-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      margin: 2em 1em;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .milestone {
+      background: #ffffff;
+      border-left: 6px solid #2196f3;
+      border-radius: 10px;
+      padding: 1em 1.5em;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: background 0.3s;
+    }
+
+    .milestone.done {
+      background: #e3fcef;
+      border-color: #4caf50;
+    }
+
+    .milestone h3 {
+      margin: 0;
+      font-size: 1.2em;
+    }
+
+    .milestone p {
+      margin: 0.3em 0 0;
+      font-size: 0.95em;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 1em;
+      font-size: 0.8em;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Speed Tracker</h1>
+    <div id="speed">0 km/h</div>
+    <div class="note">Klik "Start" untuk memulai pengukuran kecepatan dan jarak.</div>
+    <div class="controls">
+      <button class="start" onclick="startTracking()">Start</button>
+      <button class="stop" onclick="stopTracking()">Stop</button>
+      <button class="reset" onclick="resetTracking()">Reset</button>
+    </div>
+  </header>
+
+  <section class="milestone-container" id="milestoneList">
+    <div class="milestone" id="m100">
+      <h3>📍 100 Meter</h3>
+      <p>Menunggu pencapaian...</p>
+    </div>
+    <div class="milestone" id="m201">
+      <h3>📍 201 Meter</h3>
+      <p>Menunggu pencapaian...</p>
+    </div>
+    <div class="milestone" id="m402">
+      <h3>📍 402 Meter</h3>
+      <p>Menunggu pencapaian...</p>
+    </div>
+  </section>
+
+  <footer>Versi demo by Rapsxx · Gunakan di HP dengan GPS aktif</footer>
+
+  <script>
+    let watchId = null;
+    let lastPosition = null;
+    let lastTimestamp = null;
+    let startTimestamp = null;
+    let totalDistance = 0;
+
+    const milestones = [100, 201, 402];
+    let milestoneStatus = {
+      100: false,
+      201: false,
+      402: false
+    };
+
+    function toRadians(deg) {
+      return deg * Math.PI / 180;
+    }
+
+    function haversine(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const φ1 = toRadians(lat1);
+      const φ2 = toRadians(lat2);
+      const Δφ = toRadians(lat2 - lat1);
+      const Δλ = toRadians(lon2 - lon1);
+
+      const a = Math.sin(Δφ / 2) ** 2 +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function updateSpeed(position) {
+      const currentTime = position.timestamp;
+      const { latitude, longitude } = position.coords;
+
+      if (!startTimestamp) startTimestamp = currentTime;
+
+      if (lastPosition) {
+        const distance = haversine(
+          lastPosition.coords.latitude,
+          lastPosition.coords.longitude,
+          latitude,
+          longitude
+        );
+
+        const timeDiff = (currentTime - lastTimestamp) / 1000;
+        totalDistance += distance;
+
+        const speedMps = distance / timeDiff;
+        const speedKph = (speedMps * 3.6).toFixed(2);
+        document.getElementById('speed').textContent = `${speedKph} km/h`;
+
+        milestones.forEach(m => {
+          if (!milestoneStatus[m] && totalDistance >= m) {
+            const elapsedSec = ((currentTime - startTimestamp) / 1000).toFixed(2);
+            const avgSpeed = ((m / elapsedSec) * 3.6).toFixed(2);
+            const el = document.getElementById(`m${m}`);
+            el.classList.add("done");
+            el.innerHTML = `
+              <h3>✅ ${m} Meter Tercapai</h3>
+              <p>⏱ Waktu: ${elapsedSec} detik<br>🚀 Kecepatan Rata-rata: ${avgSpeed} km/h</p>
+            `;
+            milestoneStatus[m] = true;
+          }
+        });
+      }
+
+      lastPosition = position;
+      lastTimestamp = currentTime;
+    }
+
+    function startTracking() {
+      if ('geolocation' in navigator) {
+        if (watchId) return; // sudah jalan
+        watchId = navigator.geolocation.watchPosition(updateSpeed, error => {
+          console.error(error);
+          alert('Gagal mendapatkan lokasi. Aktifkan GPS dan izinkan lokasi.');
+        }, {
+          enableHighAccuracy: true,
+          maximumAge: 1000,
+          timeout: 10000
+        });
+      } else {
+        alert('Geolocation tidak didukung browser ini.');
+      }
+    }
+
+    function stopTracking() {
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        document.getElementById('speed').textContent = `0 km/h`;
+      }
+    }
+
+    function resetTracking() {
+      stopTracking();
+      lastPosition = null;
+      lastTimestamp = null;
+      startTimestamp = null;
+      totalDistance = 0;
+      milestoneStatus = {
+        100: false,
+        201: false,
+        402: false
+      };
+      document.getElementById('speed').textContent = '0 km/h';
+      document.getElementById('m100').className = 'milestone';
+      document.getElementById('m100').innerHTML = `<h3>📍 100 Meter</h3><p>Menunggu pencapaian...</p>`;
+      document.getElementById('m201').className = 'milestone';
+      document.getElementById('m201').innerHTML = `<h3>📍 201 Meter</h3><p>Menunggu pencapaian...</p>`;
+      document.getElementById('m402').className = 'milestone';
+      document.getElementById('m402').innerHTML = `<h3>📍 402 Meter</h3><p>Menunggu pencapaian...</p>`;
+    }
+  </script>
+</body>
+</html>
