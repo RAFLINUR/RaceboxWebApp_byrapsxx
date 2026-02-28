@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    background: #0f0f1b;
+    color: #00f5ff;
+    text-align: center;
+}
+
+header {
+    padding: 2rem;
+}
+
+h1 {
+    color: #ff00ff;
+    letter-spacing: 4px;
+}
+
+#speed {
+    font-size: 6rem;
+    font-weight: bold;
+    text-shadow: 0 0 25px #00f5ff;
+}
+
+.unit {
+    font-size: 1.2rem;
+    color: #888;
+}
+
+#dashboard {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem;
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    padding: 1rem;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid #00f5ff;
+    width: 180px;
+}
+
+.card p {
+    font-size: 1.2rem;
+}
+
+#map {
+    height: 400px;
+    width: 90%;
+    margin: auto;
+    border-radius: 20px;
+    border: 2px solid #ff00ff;
+}
+
+#chart-container {
+    width: 90%;
+    margin: 2rem auto;
+}
+
+.controls {
+    margin: 2rem;
+}
+
+button {
+    padding: 0.8rem 2rem;
+    margin: 0 10px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.start { background: #00ff9f; }
+.stop { background: #ff0055; }
+.reset { background: #ffaa00; }
+
+.history-title {
+    margin-top: 2rem;
+}
+
+.history-container {
+    width: 80%;
+    margin: auto;
+}
+
+.history-card {
+    border: 1px solid #00f5ff;
+    margin: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RACEBOX WEB CYBERPUNK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header>
+    <h1>RACEBOX WEB</h1>
+    <div id="speed">0</div>
+    <span class="unit">km/h</span>
+</header>
+
+<section id="dashboard">
+    <div class="card">
+        <h3>MAX SPEED</h3>
+        <p id="maxSpeed">0 km/h</p>
+    </div>
+    <div class="card">
+        <h3>DISTANCE</h3>
+        <p id="distance">0 m</p>
+    </div>
+    <div class="card">
+        <h3>0-100 KM/H</h3>
+        <p id="zeroToHundred">-</p>
+    </div>
+</section>
+
+<section id="map"></section>
+
+<section id="chart-container">
+    <canvas id="speedChart"></canvas>
+</section>
+
+<div class="controls">
+    <button onclick="startTracking()" class="start">START</button>
+    <button onclick="stopTracking()" class="stop">STOP</button>
+    <button onclick="resetTracking()" class="reset">RESET</button>
+</div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

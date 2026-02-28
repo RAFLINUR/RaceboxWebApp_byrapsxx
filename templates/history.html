@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Run History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<h1 class="history-title">RUN HISTORY</h1>
+
+<div class="history-container">
+    {% for run in runs %}
+    <div class="history-card">
+        <p>Max Speed: {{ run.max_speed }} km/h</p>
+        <p>0-100: {{ run.zero_to_hundred }} s</p>
+        <p>Distance: {{ run.distance }} m</p>
+        <p>{{ run.analysis }}</p>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+</html>
